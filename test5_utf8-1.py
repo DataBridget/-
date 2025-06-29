@@ -2,94 +2,94 @@ import pandas as pd
 import streamlit as st
 import os
 
-# ��ӡ��ǰ����Ŀ¼
-print("��ǰ����Ŀ¼:", os.getcwd())
+# 打印当前工作目录
+print("当前工作目录:", os.getcwd())
 
-# ����ҳ�����ã�����ģʽ��
+# 设置页面配置（宽屏模式）
 st.set_page_config(layout="wide")
 
-# �����˵��
-st.title('��Ʊ������Ϣ��ѯӦ��')
-st.markdown("�����Ʊ�����ѯ��ҵ��Ϣ��������·���������")
+# 标题和说明
+st.title('股票代码信息查询应用')
+st.markdown("输入股票代码查询企业信息，或浏览下方完整表格。")
 
 try:
-    # ʹ�����·����ȡ Excel �ļ�
-    df = pd.read_excel('��Ʊ����.xlsx', sheet_name='Sheet1', engine='openpyxl')
+    # 使用相对路径读取 Excel 文件
+    df = pd.read_excel('股票代码.xlsx', sheet_name='Sheet1', engine='openpyxl')
 
-    # ������������ʹ������׶�
+    # 重命名列名，使表格更易读
     df = df.rename(columns={
-        'Unnamed: 0': '��Ʊ����',
-        '��ҵ����': '��ҵ����',
-        '���ּ���Ӧ��': '���ּ���Ӧ��',
-        '�˹����ܼ���': '�˹����ܼ���',
-        '����������': '����������',
-        '�����ݼ���': '�����ݼ���',
-        '�Ƽ��㼼��': '�Ƽ��㼼��',
-        '�ܴ�Ƶ��': '�ܴ�Ƶ��'
+        'Unnamed: 0': '股票代码',
+        '企业名称': '企业名称',
+        '数字技术应用': '数字技术应用',
+        '人工智能技术': '人工智能技术',
+        '区块链技术': '区块链技术',
+        '大数据技术': '大数据技术',
+        '云计算技术': '云计算技术',
+        '总词频数': '总词频数'
     })
 
-    # ��ʾ�������ݱ��񣨴���ҳ��������
-    st.subheader('������ҵ��Ϣ')
+    # 显示完整数据表格（带分页和搜索）
+    st.subheader('所有企业信息')
     st.dataframe(
         df,
-        use_container_width=True,  # ��������Ӧ
-        hide_index=True,           # ��������
+        use_container_width=True,  # 宽度自适应
+        hide_index=True,           # 隐藏索引
         column_config={
-            "��Ʊ����": st.column_config.NumberColumn(
-                "��Ʊ����",
+            "股票代码": st.column_config.NumberColumn(
+                "股票代码",
                 format="%d",
             ),
-            "��ҵ����": st.column_config.TextColumn(
-                "��ҵ����",
+            "企业名称": st.column_config.TextColumn(
+                "企业名称",
                 width="medium",
             ),
-            "���ּ���Ӧ��": st.column_config.NumberColumn(
-                "���ּ���Ӧ��",
+            "数字技术应用": st.column_config.NumberColumn(
+                "数字技术应用",
                 format="%d",
             ),
-            "�ܴ�Ƶ��": st.column_config.NumberColumn(
-                "�ܴ�Ƶ��",
+            "总词频数": st.column_config.NumberColumn(
+                "总词频数",
                 format="%d",
             )
         },
     )
 
-    # �ָ���
+    # 分隔线
     st.markdown("---")
 
-    # ��Ʊ�����ѯ����
-    st.subheader('����Ʊ�����ѯ')
+    # 股票代码查询功能
+    st.subheader('按股票代码查询')
 
-    # ����һ����������û������Ʊ����
-    stock_code = st.text_input('�������Ʊ����')
+    # 创建一个输入框，让用户输入股票代码
+    stock_code = st.text_input('请输入股票代码')
 
-    # ���û������Ʊ����󣬽��в�ѯ
+    # 当用户输入股票代码后，进行查询
     if stock_code:
         try:
             stock_code = int(stock_code)
-            result = df[df['��Ʊ����'] == stock_code]
+            result = df[df['股票代码'] == stock_code]
 
             if not result.empty:
-                st.success(f'�ҵ���Ʊ���� {stock_code} ����Ϣ:')
+                st.success(f'找到股票代码 {stock_code} 的信息:')
 
-                # ʹ�ñ�����ʾ��ϸ��Ϣ
+                # 使用表格显示详细信息
                 st.dataframe(
                     result,
                     use_container_width=True,
                     hide_index=True,
                 )
 
-                # ��ʾ����ͼ������Ӧ�÷ֲ���
-                st.subheader('����Ӧ�÷ֲ�')
-                tech_data = result.iloc[0][['���ּ���Ӧ��', '�˹����ܼ���', '����������', '�����ݼ���', '�Ƽ��㼼��']]
+                # 显示条形图（技术应用分布）
+                st.subheader('技术应用分布')
+                tech_data = result.iloc[0][['数字技术应用', '人工智能技术', '区块链技术', '大数据技术', '云计算技术']]
                 st.bar_chart(tech_data)
             else:
-                st.warning(f'δ�ҵ���Ʊ���� {stock_code} ��Ӧ����ҵ��Ϣ')
+                st.warning(f'未找到股票代码 {stock_code} 对应的企业信息')
 
         except ValueError:
-            st.error('��������Ч�Ĺ�Ʊ���루������ʽ��')
+            st.error('请输入有效的股票代码（整数形式）')
 
 except FileNotFoundError:
-    st.error("�޷��ҵ�ָ���� Excel �ļ��������ļ�·���Ƿ���ȷ��")
+    st.error("无法找到指定的 Excel 文件，请检查文件路径是否正确。")
 except Exception as e:
-    st.error(f"��������: {str(e)}")
+    st.error(f"发生错误: {str(e)}")
